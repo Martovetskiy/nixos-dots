@@ -1,0 +1,151 @@
+# Edit this configuration file to define what should be installed on
+# your system.  Help is available in the configuration.nix(5) man page
+# and in the NixOS manual (accessible by running ‘nixos-help’).
+
+{ config, pkgs, ... }:
+
+{
+  imports =
+    [ # Include the results of the hardware scan.
+      ./hardware-configuration.nix
+    ];
+
+  # Bootloader.
+  boot.loader.limine.enable = true;
+  boot.loader.limine.efiSupport = true;
+  boot.loader.limine.enableEditor = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  boot.kernelModules = [ "snd-hda-intel" ];
+  boot.extraModprobeConfig = ''
+    options snd-hda-intel model=hp-victus
+  '';
+
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  networking.hostName = "imperfectpc";
+
+  # Configure network proxy if necessary
+  networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+
+  # Enable networking
+  networking.networkmanager.enable = true;
+ 
+  # Nix Features
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  
+  # Set your time zone.
+  time.timeZone = "Asia/Novokuznetsk";
+
+  # Select internationalisation properties.
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "ru_RU.UTF-8";
+    LC_IDENTIFICATION = "ru_RU.UTF-8";
+    LC_MEASUREMENT = "ru_RU.UTF-8";
+    LC_MONETARY = "ru_RU.UTF-8";
+    LC_NAME = "ru_RU.UTF-8";
+    LC_NUMERIC = "ru_RU.UTF-8";
+    LC_PAPER = "ru_RU.UTF-8";
+    LC_TELEPHONE = "ru_RU.UTF-8";
+    LC_TIME = "ru_RU.UTF-8";
+  };
+  
+  #Xserver
+  services.xserver.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+
+  # Configure keymap in X11
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
+  };
+
+  security.sudo = {
+    enable = true;
+    extraRules = [
+      {
+        users = [ "stepan" ];
+        commands = [
+          {
+            command = "/run/current-system/sw/bin/hda-verb";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+      }
+    ];
+  };
+
+  # Define a user account. Don't forget to set a password with ‘passwd’.
+  users.users.stepan = {
+    isNormalUser = true;
+    description = "stepan";
+    extraGroups = [ "networkmanager" "wheel" "audio" ];
+    packages = with pkgs; [];
+  };
+
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+
+  programs.hyprland.enable = true;
+  programs.nekoray.enable = true;
+  programs.nekoray.tunMode.enable = true;
+
+  # List packages installed in system profile. To search, run:
+  environment.systemPackages = with pkgs; [
+    kitty
+    wofi
+    xfce.thunar
+    vivaldi
+    neofetch
+    materialgram
+
+    git
+    hyprlock
+    brightnessctl
+    alsa-tools
+    alsa-utils  
+  ];
+
+  # List services that you want to enable:
+  services.blueman.enable = true;
+  hardware.bluetooth.enable = true;
+
+  security.polkit.enable = true;
+
+  services.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
+
+  services.upower = {
+    enable = true;
+  };
+
+  services.devmon.enable = true; 
+  services.gvfs.enable = true; 
+  services.udisks2.enable = true;
+
+  # Fonts Config
+  fonts = {
+    packages = with pkgs; [
+      nerd-fonts.jetbrains-mono
+    ];
+  };
+
+  fonts.fontconfig.enable = true;  
+
+  # Open ports in the firewall.
+  # networking.firewall.allowedTCPPorts = [ ... ];
+  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Or disable the firewall altogether.
+  # networking.firewall.enable = false;
+
+  system.stateVersion = "25.05";
+
+}
