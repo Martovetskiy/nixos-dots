@@ -14,12 +14,14 @@
   boot.loader.limine.enable = true;
   boot.loader.limine.efiSupport = true;
   boot.loader.limine.enableEditor = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  boot.kernelModules = [ "snd-hda-intel" ];
-  boot.extraModprobeConfig = ''
-    options snd-hda-intel model=hp-victus
+  boot.loader.limine.extraEntries = ''
+   /+Windows
+   //Windows 11 24H2
+   protocol: efi
+   #sudo blkid nvme... efi windows
+   path: uuid(3a635ea2-6e03-4939-92cb-5db9d133a043):/EFI/Microsoft/Boot/bootmgfw.efi
   '';
+  boot.loader.efi.canTouchEfiVariables = true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
@@ -105,7 +107,7 @@
     hyprlock
     brightnessctl
     alsa-tools
-    alsa-utils  
+    unzip  
   ];
 
   # List services that you want to enable:
