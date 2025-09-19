@@ -94,6 +94,11 @@
   programs.nekoray.enable = true;
   programs.nekoray.tunMode.enable = true;
 
+  # Variables
+  environment.variables = {
+    IDEA_VM_OPTIONS = "$HOME/jetbra/vmoptions/idea.vmoptions";
+  };  
+
   # List packages installed in system profile. To search, run:
   environment.systemPackages = with pkgs; [
     kitty
