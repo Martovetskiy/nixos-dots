@@ -6,7 +6,7 @@
     apple-fonts.url = "github:Lyndeno/apple-fonts.nix";
 
     caelestia-shell = {
-      url = "github:enk-it/shell";
+      url = "github:Martovetskiy/shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     caelestia-cli = {
@@ -16,7 +16,7 @@
   };
 
   outputs = { self, nixpkgs, caelestia-shell, caelestia-cli, ... }@inputs: {
-    nixosConfigurations.imperfectpc = nixpkgs.lib.nixosSystem {
+    nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
       modules = [
         ./configuration.nix

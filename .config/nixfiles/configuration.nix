@@ -23,9 +23,16 @@
   '';
   boot.loader.efi.canTouchEfiVariables = true;
 
+  hardware.graphics.extraPackages = with pkgs; [
+    vulkan-loader
+    vulkan-validation-layers
+    vulkan-extension-layer
+  ];
+  hardware.graphics.enable = true;
+
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  networking.hostName = "imperfectpc";
+  networking.hostName = "nixos";
 
   # Configure network proxy if necessary
   networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
@@ -56,7 +63,7 @@
   
   #Xserver
   services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
+  services.displayManager.gdm.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -112,7 +119,13 @@
     hyprlock
     brightnessctl
     alsa-tools
-    unzip  
+    unzip
+
+    android-studio
+
+    qemu_kvm
+    libvirt
+    virt-manager
   ];
 
   # List services that you want to enable:
