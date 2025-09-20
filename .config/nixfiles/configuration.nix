@@ -12,6 +12,9 @@
 
   # Bootloader.
   boot.loader.limine.enable = true;
+  boot.loader.systemd-boot.enable = false;
+  boot.loader.grub.enable = false;
+
   boot.loader.limine.efiSupport = true;
   boot.loader.limine.enableEditor = true;
   boot.loader.limine.extraEntries = ''
@@ -19,8 +22,19 @@
    //Windows 11 24H2
    protocol: efi
    #sudo blkid nvme... efi windows
-   path: uuid(3a635ea2-6e03-4939-92cb-5db9d133a043):/EFI/Microsoft/Boot/bootmgfw.efi
+   path: uuid(049ca67b-369f-464f-9d63-2ad1befebdc5):/EFI/Microsoft/Boot/bootmgfw.efi
   '';
+  boot.loader.limine.style = {
+    wallpapers = [];	
+    graphicalTerminal = {
+      palette = "1e1e2e;f38ba8;a6e3a1;f9e2af;89b4fa;f5c2e7;94e2d5;cdd6f4";
+      brightPalette = "585b70;f38ba8;a6e3a1;f9e2af;89b4fa;f5c2e7;94e2d5;cdd6f4";
+      background = "1e1e2e";       
+      foreground = "cdd6f4";       
+      brightBackground = "585b70";  
+      brightForeground = "cdd6f4";
+    };
+  };
   boot.loader.efi.canTouchEfiVariables = true;
 
   hardware.graphics.extraPackages = with pkgs; [
@@ -92,6 +106,7 @@
     description = "stepan";
     extraGroups = [ "networkmanager" "wheel" "audio" ];
     packages = with pkgs; [];
+    shell = pkgs.zsh;
   };
 
   # Allow unfree packages
@@ -100,6 +115,18 @@
   programs.hyprland.enable = true;
   programs.nekoray.enable = true;
   programs.nekoray.tunMode.enable = true;
+
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    syntaxHighlighting.enable = true;
+    autosuggestions.enable = true;
+    ohMyZsh = {
+      enable = true;
+      theme = "agnoster"; # или любой другой из oh-my-zsh тем
+      plugins = [ "git" "z" "sudo" ]; # список плагинов по желанию
+    };
+  };
 
   # Variables
   environment.variables = {
@@ -116,32 +143,76 @@
     materialgram
 
     git
+    gh
     hyprlock
     brightnessctl
     alsa-tools
     unzip
 
     android-studio
-
+    
+    pulseaudio
     qemu_kvm
     libvirt
     virt-manager
+
+    efibootmgr
+
+    material-icons
+    material-symbols
+    spotify
+    playerctl
+
+    flameshot
+    obs-studio
+    nemo
+    nemo-fileroller
+    obsidian
+    btop
+    vscode
+
+    wireplumber
+
+   jdk17
   ];
 
   # List services that you want to enable:
   services.blueman.enable = true;
   hardware.bluetooth.enable = true;
+  hardware.bluetooth.settings = {
+    General = {
+      Enable = "Source,Sink,Media,Socket";
+      Experimental = true;
+    };
+  };
 
   security.polkit.enable = true;
 
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
+
   services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
+  enable = true;
+  alsa.enable = true;
+  alsa.support32Bit = true;
+  pulse.enable = true;
+  wireplumber.extraConfig = {
+    "10-bluez" = {
+      monitor = {
+        bluez = {
+          properties = {
+            "bluez5.enable-sbc-xq" = true;
+            "bluez5.enable-msbc" = true;
+            "bluez5.enable-hw-volume" = true;
+            "bluez5.roles" = [ "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
+            "bluez5.codecs" = [ "aac" "sbc" "msbc" ];
+          };
+        };
+      };
+    };
   };
+};
+
 
   services.upower = {
     enable = true;
@@ -161,8 +232,8 @@
   fonts.fontconfig.enable = true;  
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  networking.firewall.allowedTCPPorts = [ 25565 ];
+  networking.firewall.allowedUDPPorts = [ 25565 ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
