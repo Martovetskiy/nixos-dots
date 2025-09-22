@@ -1,3 +1,4 @@
+
 $hyprDir = $HOME/.config/hypr
 
 source = $hyprDir/conf.d/00-*.conf
