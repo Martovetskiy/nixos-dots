@@ -35,6 +35,16 @@
       brightForeground = "cdd6f4";
     };
   };
+
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", ATTR{idVendor}=="10c4", MODE="0666", GROUP="dialout"
+    # ESP32 CP210x USB-to-UART
+    SUBSYSTEM=="usb", ATTR{idVendor}=="10c4", MODE="0666", GROUP="users"
+  
+    # ESP32 FTDI USB-to-UART (если используется)
+    SUBSYSTEM=="usb", ATTR{idVendor}=="0403", MODE="0666", GROUP="users"
+  '';
+
   boot.loader.efi.canTouchEfiVariables = true;
 
   hardware.graphics.extraPackages = with pkgs; [
@@ -104,7 +114,7 @@
   users.users.stepan = {
     isNormalUser = true;
     description = "stepan";
-    extraGroups = [ "networkmanager" "wheel" "audio" ];
+    extraGroups = [ "networkmanager" "wheel" "audio" "dialout" ];
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
@@ -132,6 +142,14 @@
   environment.variables = {
     IDEA_VM_OPTIONS = "$HOME/jetbra/vmoptions/idea.vmoptions";
   };  
+
+  environment.sessionVariables = {
+    XCURSOR_THEME = "Bibata-Modern-Classic"; # название вашей темы
+    XCURSOR_SIZE = "24";
+    HYPRCURSOR_THEME = "Bibata-Modern-Classic";
+    HYPRCURSOR_SIZE = "24";
+  };
+
 
   # List packages installed in system profile. To search, run:
   environment.systemPackages = with pkgs; [
@@ -173,7 +191,10 @@
 
     wireplumber
 
-   jdk17
+    jdk17
+
+    bibata-cursors
+    arduino
   ];
 
   # List services that you want to enable:
