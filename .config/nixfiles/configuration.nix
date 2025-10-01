@@ -35,14 +35,17 @@
       brightForeground = "cdd6f4";
     };
   };
-
-  services.udev.extraRules = ''
-    SUBSYSTEM=="usb", ATTR{idVendor}=="10c4", MODE="0666", GROUP="dialout"
-    # ESP32 CP210x USB-to-UART
-    SUBSYSTEM=="usb", ATTR{idVendor}=="10c4", MODE="0666", GROUP="users"
   
-    # ESP32 FTDI USB-to-UART (если используется)
-    SUBSYSTEM=="usb", ATTR{idVendor}=="0403", MODE="0666", GROUP="users"
+  # docker
+  virtualisation.docker.enable = true;
+
+  # suspend on poweroff button
+  systemd.services.systemd-logind = {
+    enable = true;
+  };
+  environment.etc."systemd/logind.conf".text = ''
+    [Login]
+    HandlePowerKey=suspend
   '';
 
   boot.loader.efi.canTouchEfiVariables = true;
@@ -62,8 +65,7 @@
   networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
-  networking.networkmanager.enable = true;
- 
+  networking.networkmanager.enable = true; 
   # Nix Features
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   
@@ -114,7 +116,7 @@
   users.users.stepan = {
     isNormalUser = true;
     description = "stepan";
-    extraGroups = [ "networkmanager" "wheel" "audio" "dialout" ];
+    extraGroups = [ "networkmanager" "wheel" "audio" "dialout" "docker" ];
     packages = with pkgs; [];
     shell = pkgs.zsh;
   };
@@ -133,8 +135,8 @@
     autosuggestions.enable = true;
     ohMyZsh = {
       enable = true;
-      theme = "agnoster"; # или любой другой из oh-my-zsh тем
-      plugins = [ "git" "z" "sudo" ]; # список плагинов по желанию
+      theme = "agnoster";
+      plugins = [ "git" "z" "sudo" ]; 
     };
   };
 
@@ -143,13 +145,13 @@
     IDEA_VM_OPTIONS = "$HOME/jetbra/vmoptions/idea.vmoptions";
   };  
 
+  # Cursor
   environment.sessionVariables = {
     XCURSOR_THEME = "Bibata-Modern-Classic"; # название вашей темы
     XCURSOR_SIZE = "24";
     HYPRCURSOR_THEME = "Bibata-Modern-Classic";
     HYPRCURSOR_SIZE = "24";
   };
-
 
   # List packages installed in system profile. To search, run:
   environment.systemPackages = with pkgs; [
@@ -187,14 +189,23 @@
     nemo-fileroller
     obsidian
     btop
-    vscode
 
     wireplumber
 
     jdk17
+    jdk11
+    jdk24
 
     bibata-cursors
-    arduino
+
+    jetbrains.idea-ultimate
+    jetbrains.pycharm-community
+    geogebra
+    figma-linux
+    
+    onlyoffice-bin
+    lazydocker
+    insomnia 
   ];
 
   # List services that you want to enable:
@@ -227,12 +238,12 @@
             "bluez5.enable-hw-volume" = true;
             "bluez5.roles" = [ "hsp_hs" "hsp_ag" "hfp_hf" "hfp_ag" ];
             "bluez5.codecs" = [ "aac" "sbc" "msbc" ];
+            };
           };
         };
       };
     };
   };
-};
 
 
   services.upower = {
